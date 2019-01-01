@@ -6,7 +6,7 @@ from torch.autograd import Variable
 from constant import *
 
 class Model(nn.Module):
-    
+
     def __init__(self,word_size,word_dim,num_filters,filter_sizes,dropout,hidden_size,pretrained_word_embeds=None):
         super(Model,self).__init__()
         self.word_size = word_size
@@ -35,7 +35,7 @@ class Model(nn.Module):
         self.out = nn.Linear(64, 1)
         self.relu = nn.ReLU()
         self._init_weights()
-        
+
     def _init_weights(self):
         init.xavier_uniform_(self.simi_weight)
         if PRE_TRAINED_EMBEDDING:
@@ -47,7 +47,7 @@ class Model(nn.Module):
         else:
             init.xavier_uniform_(self.embedding.weight.data)
 
-        
+
     def forward(self,leftx,rightx):
         leftx = leftx.type(torch.LongTensor)
         rightx = rightx.type(torch.LongTensor)
@@ -68,7 +68,7 @@ class Model(nn.Module):
 
             enc_out_left.append(enc_left_)
             enc_out_right.append(enc_right_)
-            
+
         conc_left = torch.cat(enc_out_left, 1)
         conc_right = torch.cat(enc_out_right, 1)
         transform_left = torch.mm(conc_left, self.simi_weight)
@@ -80,7 +80,7 @@ class Model(nn.Module):
         x = self.linear2(x)
         x = self.relu(x)
         x = self.out(x)
-        #x_softmax = F.log_softmax(x)
-        x_sigmoid = F.sigmoid(x)
-        #return x_softmax
-        return x_sigmoid
+        x_softmax = F.log_softmax(x)
+        #x_sigmoid = F.sigmoid(x)
+        return x_softmax
+        #return x_sigmoid

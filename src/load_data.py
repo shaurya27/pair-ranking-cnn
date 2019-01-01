@@ -21,7 +21,7 @@ if PRE_TRAINED_EMBEDDING:
     pretrained_word_embeds[0] = np.zeros((1,1))
     for i,j in enumerate(gensim_model.wv.syn0):
         pretrained_word_embeds[i+1] = j
-        
+
 ## Data generator to read csv line by line
 def data_generator(filepath):
     with open(filepath, 'r') as f:
@@ -32,13 +32,13 @@ def data_generator(filepath):
     return
 
 class CustomDataset():
-    
+
     def __init__(self,file_path,length,word2idx):
         self.file_path = file_path
         self.length = length
         self.word2idx = word2idx
         self.gen = data_generator(self.file_path)
-        
+
     def __getitem__(self,index):
         try:
             text = self.gen.next()
@@ -53,20 +53,20 @@ class CustomDataset():
         q1_word_len = len(q1)
         q2_word_len = len(q2)
         return {'q1': text[3],'q2': text[4],'labels':label,'q1_word_id':x1,'q2_word_id':x2,"q1_word_len": q1_word_len,"q2_word_len":q2_word_len}
-        
+
     def __len__(self):
         return self.length
-    
+
 def collate_fn(batch):
     q1_max_word = [item['q1_word_len'] for item in batch]
     q2_max_word = [item['q2_word_len'] for item in batch]
     q1_max_len = max(q1_max_word)
     q2_max_len = max(q2_max_word)
-    # for using 3 size kernel
-    if q1_max_len <3:
-        q1_max_len =3
-    if q2_max_len <3:
-        q2_max_len =3
+    # for using 4 size kernel
+    if q1_max_len <4:
+        q1_max_len =4
+    if q2_max_len <4:
+        q2_max_len =4
     q1_word_data = np.zeros((len(batch),q1_max_len))
     q2_word_data = np.zeros((len(batch),q2_max_len))
     for i,item in enumerate(batch):
